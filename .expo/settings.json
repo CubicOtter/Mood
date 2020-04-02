@@ -1,0 +1,8 @@
+{
+  "urlRandomness": "hv-rv4",
+  "hostType": "lan",
+  "lanType": "ip",
+  "dev": true,
+  "minify": false,
+  "https": false
+}
