@@ -1,11 +1,13 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import * as React from 'react';
 
-import { Image, StyleSheet } from 'react-native'; 
+
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
-import LinksScreen from '../screens/LinksScreen';
+import Dashboard from '../screens/Dashboard';
 import logo from '../assets/images/robot-prod.png';
+
+import { MaterialHeaderButtons, Item } from '../components/HeaderButtons';
 
 const BottomTab = createBottomTabNavigator();
 const INITIAL_ROUTE_NAME = 'Home';
@@ -19,6 +21,15 @@ export default function BottomTabNavigator({ navigation, route }) {
         headerStyle: {
             backgroundColor: '#9DB8FF',
         },
+        headerTitleStyle: {
+          color: '#FFFFFF'
+        },
+        headerShown: displayOrNotHeader(route), // choose if we display header or not
+        headerLeft: () => (
+          <MaterialHeaderButtons>
+            <Item title="Back" onPress={() => navigation.goBack(null)} />
+          </MaterialHeaderButtons>
+        ),  // Creation of a button to go back on previous screen
     });
 
   return (
@@ -27,15 +38,17 @@ export default function BottomTabNavigator({ navigation, route }) {
         name="Home"
         component={HomeScreen}
         options={{
-          title: 'Get Started',
+          title: 'Home',
           tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-code-working" />,
         }}
       />
+      
       <BottomTab.Screen
-        name="Links"
-        component={LinksScreen}
+        name="Dashboard"
+        component={Dashboard}
         options={{
-          title: 'Resources',
+          title: 'My Mood',
+          tabBarVisible: false,
           tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-book" />,
         }}
       />
@@ -49,8 +62,20 @@ function getHeaderTitle(route) {
 
   switch (routeName) {
     case 'Home':
+      return 'Menu';
+    case 'Dashboard':
       return 'Dashboard';
-    case 'Links':
-      return 'Links to learn more';
+  }
+}
+
+
+function displayOrNotHeader(route) {
+  const routeName = route.state?.routes[route.state.index]?.name ?? INITIAL_ROUTE_NAME;
+
+  switch (routeName) {
+    case 'Home':
+      return false;
+    case 'Dashboard':
+      return true;
   }
 }
