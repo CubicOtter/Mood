@@ -9,6 +9,10 @@ import { createStackNavigator } from '@react-navigation/stack';
 import BottomTabNavigator from './navigation/BottomTabNavigator';
 import useLinking from './navigation/useLinking';
 
+// Imports to manage notifications
+import { Notifications } from 'expo';
+import * as Permissions from 'expo-permissions';
+
 const Stack = createStackNavigator();
 
 export default function App(props) {
@@ -30,6 +34,8 @@ export default function App(props) {
         await Font.loadAsync({
           ...Ionicons.font,
           'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
+          'caveat': require('./assets/fonts/Caveat-Regular.ttf'),
+          'caveat-bold': require('./assets/fonts/Caveat-Regular.ttf'),
         });
       } catch (e) {
         // We might want to provide this error information to an error reporting service
@@ -39,7 +45,7 @@ export default function App(props) {
         SplashScreen.hide();
       }
     }
-
+     
     loadResourcesAndDataAsync();
   }, []);
 
@@ -50,8 +56,8 @@ export default function App(props) {
       <View style={styles.container}>
         {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
         <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
-          <Stack.Navigator>
-            <Stack.Screen name="Root" component={BottomTabNavigator} />
+          <Stack.Navigator >
+            <Stack.Screen name="Root" component={BottomTabNavigator} /> 
           </Stack.Navigator>
         </NavigationContainer>
       </View>
@@ -65,3 +71,4 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
 });
+
