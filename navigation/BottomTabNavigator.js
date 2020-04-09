@@ -1,11 +1,15 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import * as React from 'react';
 
-import { Image, StyleSheet } from 'react-native'; 
+
 import TabBarIcon from '../components/TabBarIcon';
 import HomeScreen from '../screens/HomeScreen';
-import LinksScreen from '../screens/LinksScreen';
-import logo from '../assets/images/robot-prod.png';
+import DashboardScreen from '../screens/DashboardScreen';
+import Login from '../screens/Login';
+import Register from '../screens/Register';
+import firebase from '../backend/Firebase';
+
+import { MaterialHeaderButtons, Item } from '../components/HeaderButtons';
 
 const BottomTab = createBottomTabNavigator();
 const INITIAL_ROUTE_NAME = 'Home';
@@ -19,29 +23,85 @@ export default function BottomTabNavigator({ navigation, route }) {
         headerStyle: {
             backgroundColor: '#9DB8FF',
         },
+        headerTitleStyle: {
+          color: '#FFFFFF'
+        },
+        headerShown: displayOrNotHeader(route), // choose if we display header or not
+        headerLeft: () => (
+          <MaterialHeaderButtons>
+            <Item title="Back" onPress={() => navigation.goBack(null)} />  
+          </MaterialHeaderButtons>
+        ),  // Creation of a button to go back on previous screen
     });
 
-  return (
-    <BottomTab.Navigator initialRouteName={INITIAL_ROUTE_NAME}>
-      <BottomTab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          title: 'Get Started',
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-code-working" />,
-        }}
-      />
-      <BottomTab.Screen
-        name="Links"
-        component={LinksScreen}
-        options={{
-          title: 'Resources',
-          tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-book" />,
-        }}
-      />
-    </BottomTab.Navigator>
-  );
+
+  // Different Bottom Bar depending of whether the user is logged in or not
+  // If the user is not connected, login and register options are avaialable, but not Dashboard
+  // If the user is logged in, the options login and register are not available, and the Dashboard is available
+  if(!firebase.getCurrentUsername()) {
+    return (
+      <BottomTab.Navigator initialRouteName={INITIAL_ROUTE_NAME}>
+        
+        <BottomTab.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{
+            title: 'Home',
+            tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-home" />,
+          }}
+        /> 
+        
+        <BottomTab.Screen
+          name="Login"
+          component={Login}
+          options={{
+            title: 'Login',
+            tabBarVisible: false, //Doesn't display the tabBar
+            tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-unlock" />,
+          }}
+        />
+
+        <BottomTab.Screen
+          name="Register"
+          component={Register}
+          options={{
+            title: 'Register',
+            tabBarVisible: false, //Doesn't display the tabBar
+            tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-add-circle" />,
+          }}
+        />
+
+      </BottomTab.Navigator>
+    );
+  } else {
+      return(
+        <BottomTab.Navigator initialRouteName={INITIAL_ROUTE_NAME}>
+        
+        <BottomTab.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{
+            title: 'Home',
+            tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-home" />,
+          }}
+        /> 
+        
+        <BottomTab.Screen
+          name="Dashboard"
+          component={DashboardScreen}
+          options={{
+            title: 'My Mood',
+            tabBarVisible: false, //Doesn't display the tabBar
+            tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-dashboard" />,
+          }}
+        />
+
+      </BottomTab.Navigator>
+      );
+  }
+
 }
+
 
 
 function getHeaderTitle(route) {
@@ -49,8 +109,43 @@ function getHeaderTitle(route) {
 
   switch (routeName) {
     case 'Home':
+      return 'Menu';
+    case 'Dashboard':
       return 'Dashboard';
-    case 'Links':
-      return 'Links to learn more';
+    case 'Login':
+      return 'Login';
+    case 'Register':
+      return 'Register';
+  }
+}
+
+
+function displayOrNotHeader(route) {
+  const routeName = route.state?.routes[route.state.index]?.name ?? INITIAL_ROUTE_NAME;
+
+  switch (routeName) {
+    case 'Home':
+      return false;
+    case 'Dashboard':
+      return true;
+    case 'Login':
+      return true;
+    case 'Register':
+      return true;
+  }
+}
+
+function redirectButton(route) {
+  const routeName = route.state?.routes[route.state.index]?.name ?? INITIAL_ROUTE_NAME;
+
+  switch (routeName) {
+    case 'Home':
+      return '';
+    case 'Dashboard':
+      return 'navigation.goBack(null)';
+    case 'Login':
+      return 'navigation.goBack(null)';
+    case 'Register':
+      return 'navigation.goBack(null)';
   }
 }

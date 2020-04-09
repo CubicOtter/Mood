@@ -9,12 +9,12 @@
     ],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/splash_logo.png",
     "scheme": "myapp",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#9DB8FF"
     },
     "updates": {
       "fallbackToCacheTimeout": 0

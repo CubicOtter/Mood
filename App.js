@@ -9,6 +9,11 @@ import { createStackNavigator } from '@react-navigation/stack';
 import BottomTabNavigator from './navigation/BottomTabNavigator';
 import useLinking from './navigation/useLinking';
 
+// File with log data for the firebase server and class with basic functions to manage it
+import firebase from './backend/Firebase'; 
+
+
+
 const Stack = createStackNavigator();
 
 export default function App(props) {
@@ -17,6 +22,7 @@ export default function App(props) {
   const containerRef = React.useRef();
   const { getInitialState } = useLinking(containerRef);
 
+  
   // Load any resources or data that we need prior to rendering the app
   React.useEffect(() => {
     async function loadResourcesAndDataAsync() {
@@ -30,6 +36,8 @@ export default function App(props) {
         await Font.loadAsync({
           ...Ionicons.font,
           'space-mono': require('./assets/fonts/SpaceMono-Regular.ttf'),
+          'caveat': require('./assets/fonts/Caveat-Regular.ttf'),
+          'caveat-bold': require('./assets/fonts/Caveat-Regular.ttf'),
         });
       } catch (e) {
         // We might want to provide this error information to an error reporting service
@@ -43,20 +51,33 @@ export default function App(props) {
     loadResourcesAndDataAsync();
   }, []);
 
-  if (!isLoadingComplete && !props.skipLoadingScreen) {
+
+  // Const to know if server is loaded or not
+  const [firebaseInitialized, setFirebaseInitialized] = React.useState(false);
+
+  // Check if firebase is initialized before rendering the app
+  React.useEffect(() => {firebase.isInitialized().then(val => {
+      setFirebaseInitialized(val)
+    });
+  });
+   
+
+  if (!isLoadingComplete && !props.skipLoadingScreen ) {  
+    return null;
+  } else if (firebaseInitialized == false) {  //add initialization of firebase as a condition to start the app
     return null;
   } else {
-    return (
+    return ( 
       <View style={styles.container}>
         {Platform.OS === 'ios' && <StatusBar barStyle="default" />}
         <NavigationContainer ref={containerRef} initialState={initialNavigationState}>
-          <Stack.Navigator>
-            <Stack.Screen name="Root" component={BottomTabNavigator} />
+          <Stack.Navigator >
+            <Stack.Screen name="Root" component={BottomTabNavigator} /> 
           </Stack.Navigator>
         </NavigationContainer>
       </View>
     );
-  }
+  };
 }
 
 const styles = StyleSheet.create({
