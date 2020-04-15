@@ -71,6 +71,16 @@ export default function BottomTabNavigator({ navigation, route }) {
           }}
         />
 
+        <BottomTab.Screen
+          name="Dashboard"
+          component={DashboardScreen}
+          options={{
+            title: 'My Mood',
+            tabBarVisible: true, //Doesn't display the tabBar
+            tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="ios-build" />,
+          }}
+        />
+
       </BottomTab.Navigator>
     );
   } else {
@@ -92,7 +102,7 @@ export default function BottomTabNavigator({ navigation, route }) {
           options={{
             title: 'My Mood',
             tabBarVisible: false, //Doesn't display the tabBar
-            tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="md-dashboard" />,
+            tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="ios-build" />,
           }}
         />
 

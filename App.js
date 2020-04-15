@@ -13,7 +13,7 @@ import useLinking from './navigation/useLinking';
 import firebase from './backend/Firebase'; 
 
 
-
+// Navigator between screens
 const Stack = createStackNavigator();
 
 export default function App(props) {
@@ -22,7 +22,7 @@ export default function App(props) {
   const containerRef = React.useRef();
   const { getInitialState } = useLinking(containerRef);
 
-  
+    
   // Load any resources or data that we need prior to rendering the app
   React.useEffect(() => {
     async function loadResourcesAndDataAsync() {
@@ -61,6 +61,7 @@ export default function App(props) {
     });
   });
    
+
 
   if (!isLoadingComplete && !props.skipLoadingScreen ) {  
     return null;
