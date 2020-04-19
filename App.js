@@ -12,9 +12,9 @@ import useLinking from './navigation/useLinking';
 // File with log data for the firebase server and class with basic functions to manage it
 import firebase from './backend/Firebase'; 
 
-
 // Navigator between screens
 const Stack = createStackNavigator();
+
 
 export default function App(props) {
   const [isLoadingComplete, setLoadingComplete] = React.useState(false);
@@ -60,14 +60,13 @@ export default function App(props) {
       setFirebaseInitialized(val)
     });
   });
-   
+  
 
-
-  if (!isLoadingComplete && !props.skipLoadingScreen ) {  
+  if (!isLoadingComplete && !props.skipLoadingScreen ) {   // Show nothing if the app is not loaded
     return null;
   } else if (firebaseInitialized == false) {  //add initialization of firebase as a condition to start the app
     return null;
-  } else {
+  } else { // App loaded and firebase initialized!  
     return ( 
       <View style={styles.container}>
         {Platform.OS === 'ios' && <StatusBar barStyle="default" />}

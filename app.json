@@ -9,7 +9,7 @@
     ],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/splash_logo.png",
+    "icon": "./assets/images/logo_resized.png",
     "scheme": "myapp",
     "splash": {
       "image": "./assets/images/splash.png",
@@ -24,6 +24,11 @@
     ],
     "ios": {
       "supportsTablet": true
+    },
+    "notification": {
+      "icon": "./assets/images/logo_notification.png",     
+      "color": "#9DB8FF",
+      "androidMode": "default"
     }
   }
 }

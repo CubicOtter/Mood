@@ -5,6 +5,9 @@ import {Card} from 'react-native-elements'
 import { Button, TextInput } from 'react-native'; 
 import firebase from '../backend/Firebase';
 
+// To handle push Notifications
+import { Notifications } from 'expo';
+import * as Permissions from 'expo-permissions';
 
 // Implementation for swuipe rating is here: https://github.com/Monte9/react-native-ratings
 // Import for rate bar
@@ -31,6 +34,32 @@ export default function DashboardScreen({navigation}) {
     console.log(`You rated your mood: ${rating}`)
   }
 
+
+  // Const to get user Push Token
+  const [token, setToken] = React.useState("");
+
+  // Constant to check if notification has already been scheduled
+  const [notifScheduled, setNotifScheduled] = React.useState(false);
+
+  // Define the shape of a local Notification
+  const localNotification = {
+    title: 'Mood - How do you feel today?',
+    body: 'It may be time to rate your mood', // (string) — body text of the notification.
+    icon: "./assets/images/logo_notification.png",
+    ios: { // (optional) (object) — notification configuration specific to iOS.
+      sound: true // (optional) (boolean) — if true, play a sound. Default: false.
+    },
+    android: // (optional) (object) — notification configuration specific to Android.
+    {
+      sound: true, // (optional) (boolean) — if true, play a sound. Default: false.
+      icon: "./assets/images/logo_resized.png", //(optional) (string) — URL of icon to display in notification drawer.
+      color: "9DB8FF", // (optional) (string) — color of the notification icon in notification drawer.
+      priority: 'high', // (optional) (min | low | high | max) — android may present notifications according to the priority, for example a high priority notification will likely to be shown as a heads-up notification.
+      sticky: false, // (optional) (boolean) — if true, the notification will be sticky and not dismissable by user. The notification must be programmatically dismissed. Default: false.
+      vibrate: true // (optional) (boolean or array) — if true, vibrate the device. An array can be supplied to specify the vibration pattern, e.g. - [ 0, 500 ].
+      // link (optional) (string) — external link to open when notification is selected.
+    }
+  };
 
 
   if(!firebase.getCurrentUsername()) {
@@ -75,6 +104,11 @@ export default function DashboardScreen({navigation}) {
 
             </Card>
 
+            <TouchableOpacity style={styles.notificationButton} onPress={scheduleNotification} >
+                  <Text style={styles.textNotificationButton} >Allow Notifications</Text>
+            </TouchableOpacity>
+            
+
             <TouchableOpacity style={styles.button} onPress={logout} >
                   <Text style={styles.textButton} >Disconnect</Text>
             </TouchableOpacity>
@@ -105,7 +139,86 @@ export default function DashboardScreen({navigation}) {
   }
 
 
-}
+  // Function to ask user to grant permission and prints the token on console
+  // Taken on the website of expo: https://docs.expo.io/versions/latest/guides/push-notifications/
+  async function getPushNotificationPermissions() {
+    const { status: existingStatus } = await Permissions.getAsync(Permissions.NOTIFICATIONS);
+    let finalStatus = existingStatus;
+
+    // only ask if permissions have not already been determined, because
+    // iOS won't necessarily prompt the user a second time.
+    if (existingStatus !== 'granted') {
+      // Android remote notification permissions are granted during the app
+      // install, so this will only ask on iOS
+      const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+      finalStatus = status;
+    }
+
+    // Stop here if the user did not grant permissions
+    if (finalStatus !== 'granted') {
+      alert("Failed to get permission for notifications from your phone");
+      return;
+    }
+    // console.log(finalStatus)
+
+    // Get the token that uniquely identifies this device
+    tok = await Notifications.getExpoPushTokenAsync();
+    console.log("Notification Token: ", tok);
+    setToken(tok);
+
+    // Specific display if on Android
+    if (Platform.OS === 'android') {
+      Notifications.createChannelAndroidAsync('default', {
+        name: 'default',
+        sound: true,
+        priority: 'max',
+        vibrate: [0, 250, 250, 250],
+      });
+    };
+  }
+
+
+  async function scheduleNotification() {
+    try {
+      if (token == "") {
+         await getPushNotificationPermissions();
+      } else {
+        alert("You already scheduled a notification");
+      };
+    } catch(e) {
+      // We might want to provide this error information to an error reporting service
+      console.warn(e);
+    } finally {
+      if (notifScheduled == false) { 
+
+          Notifications.cancelAllScheduledNotificationsAsync(); // Cancel all previous scheduled notification
+          // Pour éviter que Bibi en programme 60 par heures quand il s'amuse
+
+          let t = new Date().getTime() + 60000; // 260000 = 1 hour from now
+          // First notification received one minute after to test
+
+          // Options for schedules notifications
+          const schedulingOptions = {
+            time: t, // (date or number) — A Date object representing when to fire the notification or a number in Unix epoch time. Example: (new Date()).getTime() + 1000 is one second from now.
+            repeat: 'hour',
+          };
+    
+          Notifications.scheduleLocalNotificationAsync(localNotification, schedulingOptions); // Create the scheduled notification
+
+          Notifications.addListener(notification => navigation.navigate("Dashboard"));
+
+          console.log("Notification scheduled every hour");
+          alert("Notification scheduled every hour")
+    
+          setNotifScheduled(true); // Update notifScheduled statut
+    
+        } else  {
+          console.log("Failed to schedule notification");
+          return;
+        };
+      }
+    }
+  }
 
 
 const styles = StyleSheet.create({
@@ -145,6 +258,17 @@ const styles = StyleSheet.create({
   },
   textRegisterButton: {
     fontSize: 15,
+    color: "#FFFFFF",
+  },
+  notificationButton: {
+    marginTop: 40,
+    marginHorizontal: 40,
+    alignItems: "center",
+    backgroundColor: "#395CB3",
+    padding: 10,
+  },
+  textNotificationButton: {
+    fontSize: 20,
     color: "#FFFFFF",
   }
 });
