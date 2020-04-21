@@ -25,6 +25,11 @@
     "ios": {
       "supportsTablet": true
     },
+    "android": {
+      "package": "com.tanguythan.mood",
+      "versionCode": 2,
+      "icon": "./assets/images/logo_notification.png"
+    },
     "notification": {
       "icon": "./assets/images/logo_notification.png",     
       "color": "#9DB8FF",

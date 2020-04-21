@@ -41,7 +41,7 @@ export default function Login({navigation}) {
   async function onLogin() {
     try {
           await firebase.login(email, password);
-          navigation.navigate("Dashboard"); // Redirect to Dashboard if succesfully logged in
+          navigation.navigate("Home"); // Redirect to Dashboard if succesfully logged in
     } catch(error) {
           alert(error.message)
     }
